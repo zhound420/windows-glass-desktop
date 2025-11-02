@@ -384,13 +384,9 @@ This automation script is provided as-is for educational purposes. Each tool has
 
 ## Screenshots
 
-### Before
-Standard Windows 11 opaque interface
+![Glass Desktop Effects](screenshot.png)
 
-### After
-- Translucent taskbar with blur
-- Frosted glass File Explorer
-- Acrylic window backgrounds throughout the system
+*Showcasing the complete glass desktop transformation: translucent taskbar with Acrylic blur, frosted glass File Explorer with transparent address bar, and Acrylic window backgrounds throughout Windows 11. The Windows Update dialog and File Explorer demonstrate the beautiful depth and transparency effects.*
 
 ## Support
 

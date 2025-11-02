@@ -174,11 +174,6 @@ function Start-MSIXApp {
             return $false
         }
 
-        # Restart Explorer to prevent XAML Diagnostics errors (fixes TranslucentTB crash)
-        Write-Host "Preparing XAML environment for $AppName..." -ForegroundColor Gray
-        Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
-        Start-Sleep -Seconds 2
-
         # Launch the app using shell protocol
         $appUserModelId = "$($package.PackageFamilyName)!$appId"
         Start-Process "shell:AppsFolder\$appUserModelId"
@@ -277,7 +272,7 @@ function Install-MicaForEveryone {
             New-Item -ItemType Directory -Path $configPath -Force | Out-Null
         }
 
-        $configFile = Join-Path $configPath "config.xcl"
+        $configFile = Join-Path $configPath "MicaForEveryone.conf"
         # Build config content line by line to avoid parser issues
         $configLines = @(
             '# MicaForEveryone Configuration - Acrylic Effects'
