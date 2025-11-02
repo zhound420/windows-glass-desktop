@@ -38,6 +38,9 @@ param(
 # Global variables
 $Script:ExplorerBlurMicaPath = "C:\Program Files\ExplorerBlurMica"
 $Script:ExplorerBlurMicaUrl = "https://github.com/Maplespe/ExplorerBlurMica/releases/download/2.0.1/Release_x64.zip"
+$Script:VCRedistUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+$Script:MicaForEveryoneUrl = "https://github.com/MicaForEveryone/MicaForEveryone/releases/download/2.0.5.0/bundle.msixbundle"
+$Script:TranslucentTBUrl = "https://github.com/TranslucentTB/TranslucentTB/releases/download/2025.1/bundle.msixbundle"
 
 function Test-Prerequisites {
     <#
@@ -64,6 +67,78 @@ function Test-Prerequisites {
     }
 
     return $true
+}
+
+function Install-VCRedist {
+    <#
+    .SYNOPSIS
+        Checks for and installs Visual C++ Redistributables if missing.
+    #>
+    Write-Host "`n=== Checking Visual C++ Redistributables ===" -ForegroundColor Cyan
+
+    # Check if VC++ Redistribut is already installed
+    $vcInstalled = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" -ErrorAction SilentlyContinue
+
+    if ($vcInstalled -and $vcInstalled.Installed -eq 1) {
+        Write-Host "Visual C++ Redistributables already installed" -ForegroundColor Green
+        return $true
+    }
+
+    Write-Host "Visual C++ Redistributables not found. Installing..." -ForegroundColor Yellow
+
+    try {
+        $vcPath = "$env:TEMP\vc_redist.x64.exe"
+
+        Write-Host "Downloading VC++ Redistributables..." -ForegroundColor Gray
+        Invoke-WebRequest -Uri $Script:VCRedistUrl -OutFile $vcPath -UseBasicParsing
+
+        Write-Host "Installing VC++ Redistributables (this may take a minute)..." -ForegroundColor Gray
+        $process = Start-Process -FilePath $vcPath -ArgumentList "/install /quiet /norestart" -Wait -PassThru
+
+        if ($process.ExitCode -eq 0 -or $process.ExitCode -eq 3010) {
+            Write-Host "VC++ Redistributables installed successfully!" -ForegroundColor Green
+            Remove-Item $vcPath -Force -ErrorAction SilentlyContinue
+            return $true
+        } else {
+            Write-Host "WARNING: VC++ installation returned exit code $($process.ExitCode)" -ForegroundColor Yellow
+            return $false
+        }
+    } catch {
+        Write-Host "ERROR: Failed to install VC++ Redistributables: $_" -ForegroundColor Red
+        Write-Host "Please install manually from: $Script:VCRedistUrl" -ForegroundColor Yellow
+        return $false
+    }
+}
+
+function Install-MSIXPackage {
+    <#
+    .SYNOPSIS
+        Downloads and installs an MSIX bundle package.
+    #>
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Name,
+
+        [Parameter(Mandatory=$true)]
+        [string]$Url
+    )
+
+    try {
+        $msixPath = "$env:TEMP\$Name.msixbundle"
+
+        Write-Host "Downloading $Name from GitHub..." -ForegroundColor Gray
+        Invoke-WebRequest -Uri $Url -OutFile $msixPath -UseBasicParsing
+
+        Write-Host "Installing $Name..." -ForegroundColor Gray
+        Add-AppxPackage -Path $msixPath -ErrorAction Stop
+
+        Write-Host "$Name installed successfully via MSIX!" -ForegroundColor Green
+        Remove-Item $msixPath -Force -ErrorAction SilentlyContinue
+        return $true
+    } catch {
+        Write-Host "ERROR: Failed to install $Name via MSIX: $_" -ForegroundColor Red
+        return $false
+    }
 }
 
 function Install-WinGetIfMissing {
@@ -108,26 +183,23 @@ function Install-MicaForEveryone {
     Write-Host "`n=== Installing MicaForEveryone ===" -ForegroundColor Cyan
 
     try {
-        # Install via WinGet with better error handling
-        Write-Host "Installing MicaForEveryone via WinGet..." -ForegroundColor Gray
-
-        # Capture output for better error messages
+        # Try WinGet first (fast if it works)
+        Write-Host "Attempting installation via WinGet..." -ForegroundColor Gray
         $output = winget install --id=MicaForEveryone.MicaForEveryone -e --accept-package-agreements --accept-source-agreements 2>&1
 
         if ($LASTEXITCODE -eq 0 -or $output -like "*Successfully installed*") {
-            Write-Host "MicaForEveryone installed successfully!" -ForegroundColor Green
-        } elseif ($LASTEXITCODE -eq -1978335189) {
-            Write-Host "WinGet package issue detected. Trying alternative installation..." -ForegroundColor Yellow
-            Write-Host "Note: You may need to install MicaForEveryone manually from:" -ForegroundColor Yellow
-            Write-Host "  https://github.com/MicaForEveryone/MicaForEveryone/releases" -ForegroundColor Cyan
-            throw "WinGet installation failed - package may not be available"
+            Write-Host "MicaForEveryone installed successfully via WinGet!" -ForegroundColor Green
+            Start-Sleep -Seconds 3
         } else {
-            Write-Host "WinGet output: $output" -ForegroundColor Yellow
-            throw "WinGet installation failed with exit code $LASTEXITCODE"
-        }
+            # WinGet failed, use MSIX fallback
+            Write-Host "WinGet failed. Trying direct MSIX installation..." -ForegroundColor Yellow
+            $installed = Install-MSIXPackage -Name "MicaForEveryone" -Url $Script:MicaForEveryoneUrl
 
-        # Wait a moment for installation to complete
-        Start-Sleep -Seconds 3
+            if (-not $installed) {
+                throw "Failed to install via both WinGet and MSIX"
+            }
+            Start-Sleep -Seconds 2
+        }
 
         # Create Acrylic configuration
         Write-Host "Configuring Acrylic effects..." -ForegroundColor Gray
@@ -179,26 +251,23 @@ function Install-TranslucentTB {
     Write-Host "`n=== Installing TranslucentTB ===" -ForegroundColor Cyan
 
     try {
-        # Install via WinGet with better error handling
-        Write-Host "Installing TranslucentTB via WinGet..." -ForegroundColor Gray
-
-        # Capture output for better error messages
+        # Try WinGet first (fast if it works)
+        Write-Host "Attempting installation via WinGet..." -ForegroundColor Gray
         $output = winget install --id=CharlesMilette.TranslucentTB -e --accept-package-agreements --accept-source-agreements 2>&1
 
         if ($LASTEXITCODE -eq 0 -or $output -like "*Successfully installed*") {
-            Write-Host "TranslucentTB installed successfully!" -ForegroundColor Green
-        } elseif ($LASTEXITCODE -eq -1978335189) {
-            Write-Host "WinGet package issue detected. Trying alternative installation..." -ForegroundColor Yellow
-            Write-Host "Note: You may need to install TranslucentTB manually from:" -ForegroundColor Yellow
-            Write-Host "  https://github.com/TranslucentTB/TranslucentTB/releases" -ForegroundColor Cyan
-            throw "WinGet installation failed - package may not be available"
+            Write-Host "TranslucentTB installed successfully via WinGet!" -ForegroundColor Green
+            Start-Sleep -Seconds 3
         } else {
-            Write-Host "WinGet output: $output" -ForegroundColor Yellow
-            throw "WinGet installation failed with exit code $LASTEXITCODE"
-        }
+            # WinGet failed, use MSIX fallback
+            Write-Host "WinGet failed. Trying direct MSIX installation..." -ForegroundColor Yellow
+            $installed = Install-MSIXPackage -Name "TranslucentTB" -Url $Script:TranslucentTBUrl
 
-        # Wait for installation to complete
-        Start-Sleep -Seconds 3
+            if (-not $installed) {
+                throw "Failed to install via both WinGet and MSIX"
+            }
+            Start-Sleep -Seconds 2
+        }
 
         Write-Host "TranslucentTB will use Acrylic effect by default." -ForegroundColor Gray
         Write-Host "You can customize settings by right-clicking its system tray icon." -ForegroundColor Gray
@@ -286,6 +355,13 @@ function Install-ExplorerBlurMica {
         $configLines | Out-File -FilePath $configPath -Encoding UTF8 -Force
         Write-Host "Configuration file created: $configPath" -ForegroundColor Green
 
+        # Install VC++ Redistributables if needed (required for DLL registration)
+        Write-Host "Checking Visual C++ Redistributables..." -ForegroundColor Gray
+        $vcInstalled = Install-VCRedist
+        if (-not $vcInstalled) {
+            Write-Host "WARNING: VC++ Redistributables not installed. DLL registration may fail." -ForegroundColor Yellow
+        }
+
         # Register DLL with better error handling
         Write-Host "Registering ExplorerBlurMica DLL..." -ForegroundColor Gray
         # Re-check DLL path after potential move
@@ -300,15 +376,6 @@ function Install-ExplorerBlurMica {
 
         if ($process.ExitCode -eq 0) {
             Write-Host "DLL registered successfully!" -ForegroundColor Green
-        } elseif ($process.ExitCode -eq -1073741819) {
-            Write-Host "WARNING: DLL registration failed (Access Violation - 0xC0000005)" -ForegroundColor Yellow
-            Write-Host "This is often caused by missing Visual C++ Redistributables." -ForegroundColor Yellow
-            Write-Host "" -ForegroundColor Yellow
-            Write-Host "Please install the Visual C++ Redistributable:" -ForegroundColor Cyan
-            Write-Host "  https://aka.ms/vs/17/release/vc_redist.x64.exe" -ForegroundColor Cyan
-            Write-Host "" -ForegroundColor Yellow
-            Write-Host "After installing, restart your computer and run the script again." -ForegroundColor Yellow
-            throw "DLL registration failed - missing dependencies"
         } else {
             Write-Host "WARNING: DLL registration failed with exit code: $($process.ExitCode)" -ForegroundColor Yellow
             Write-Host "ExplorerBlurMica may not work correctly." -ForegroundColor Yellow
