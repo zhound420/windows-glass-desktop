@@ -206,29 +206,29 @@ function Install-ExplorerBlurMica {
 
         # Create config.ini with Acrylic effect
         Write-Host "Creating Acrylic configuration..." -ForegroundColor Gray
-        $configContent = @'
-[config]
-effect=1
-clearAddress=true
-clearBarBg=false
-clearWinUIBg=true
-showLine=true
-
-[light]
-r=255
-g=255
-b=255
-a=128
-
-[dark]
-r=32
-g=32
-b=32
-a=192
-'@
+        $configLines = @(
+            '[config]'
+            'effect=1'
+            'clearAddress=true'
+            'clearBarBg=false'
+            'clearWinUIBg=true'
+            'showLine=true'
+            ''
+            '[light]'
+            'r=255'
+            'g=255'
+            'b=255'
+            'a=128'
+            ''
+            '[dark]'
+            'r=32'
+            'g=32'
+            'b=32'
+            'a=192'
+        )
 
         $configPath = Join-Path $Script:ExplorerBlurMicaPath "config.ini"
-        $configContent | Out-File -FilePath $configPath -Encoding UTF8 -Force
+        $configLines | Out-File -FilePath $configPath -Encoding UTF8 -Force
         Write-Host "Configuration file created: $configPath" -ForegroundColor Green
 
         # Register DLL
@@ -271,18 +271,19 @@ function Install-GlassDesktop {
     .SYNOPSIS
         Main installation function that orchestrates the entire glass desktop setup.
     #>
-    Write-Host @"
-╔═══════════════════════════════════════════════════════════╗
-║                                                           ║
-║        Windows 11 Glass Desktop Installation              ║
-║                                                           ║
-║   This will install and configure:                        ║
-║   • MicaForEveryone (Acrylic window effects)             ║
-║   • TranslucentTB (Acrylic taskbar)                      ║
-║   • ExplorerBlurMica (Acrylic File Explorer)             ║
-║                                                           ║
-╚═══════════════════════════════════════════════════════════╝
-"@ -ForegroundColor Cyan
+    $banner = @(
+        '╔═══════════════════════════════════════════════════════════╗'
+        '║                                                           ║'
+        '║        Windows 11 Glass Desktop Installation              ║'
+        '║                                                           ║'
+        '║   This will install and configure:                        ║'
+        '║   • MicaForEveryone (Acrylic window effects)             ║'
+        '║   • TranslucentTB (Acrylic taskbar)                      ║'
+        '║   • ExplorerBlurMica (Acrylic File Explorer)             ║'
+        '║                                                           ║'
+        '╚═══════════════════════════════════════════════════════════╝'
+    )
+    Write-Host ($banner -join "`n") -ForegroundColor Cyan
 
     # Track installation results
     $results = @{
@@ -436,32 +437,33 @@ Export-ModuleMember -Function Install-GlassDesktop, Uninstall-GlassDesktop
 
 # Display usage information if script is run directly
 if ($MyInvocation.InvocationName -ne '.') {
-    Write-Host @"
-╔═══════════════════════════════════════════════════════════╗
-║                                                           ║
-║        Windows 11 Glass Desktop Automation Script         ║
-║                                                           ║
-╚═══════════════════════════════════════════════════════════╝
-
-Usage:
-  Install:   Install-GlassDesktop
-  Uninstall: Uninstall-GlassDesktop
-
-What this script does:
-  • Installs MicaForEveryone for Acrylic window effects
-  • Installs TranslucentTB for Acrylic taskbar
-  • Installs ExplorerBlurMica for Acrylic File Explorer
-  • Configures all tools with Acrylic visual effects
-  • Provides easy uninstall function
-
-Requirements:
-  • Windows 10 (build 18362+) or Windows 11
-  • Administrator privileges
-  • Internet connection
-
-Examples:
-  .\Install-GlassDesktop.ps1; Install-GlassDesktop
-  .\Install-GlassDesktop.ps1; Uninstall-GlassDesktop
-
-"@ -ForegroundColor Cyan
+    $helpText = @(
+        '╔═══════════════════════════════════════════════════════════╗'
+        '║                                                           ║'
+        '║        Windows 11 Glass Desktop Automation Script         ║'
+        '║                                                           ║'
+        '╚═══════════════════════════════════════════════════════════╝'
+        ''
+        'Usage:'
+        '  Install:   Install-GlassDesktop'
+        '  Uninstall: Uninstall-GlassDesktop'
+        ''
+        'What this script does:'
+        '  • Installs MicaForEveryone for Acrylic window effects'
+        '  • Installs TranslucentTB for Acrylic taskbar'
+        '  • Installs ExplorerBlurMica for Acrylic File Explorer'
+        '  • Configures all tools with Acrylic visual effects'
+        '  • Provides easy uninstall function'
+        ''
+        'Requirements:'
+        '  • Windows 10 (build 18362+) or Windows 11'
+        '  • Administrator privileges'
+        '  • Internet connection'
+        ''
+        'Examples:'
+        '  .\Install-GlassDesktop.ps1; Install-GlassDesktop'
+        '  .\Install-GlassDesktop.ps1; Uninstall-GlassDesktop'
+        ''
+    )
+    Write-Host ($helpText -join "`n") -ForegroundColor Cyan
 }
