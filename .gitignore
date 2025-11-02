@@ -1,0 +1,49 @@
+# Windows-specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# PowerShell
+*.ps1~
+*.psm1~
+
+# Logs
+*.log
+*.out
+*.err
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Download artifacts
+*.zip
+*.exe
+*.msi
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+
+# IDE and editors
+.vscode/
+.idea/
+*.sublime-*
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Project specific
+transcription.txt
+test/
+temp/
+downloads/
