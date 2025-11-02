@@ -42,6 +42,9 @@ This script automatically installs and configures three powerful tools to give y
 - **Administrator privileges** (required for DLL registration)
 - **Internet connection** (for downloading tools)
 - **PowerShell 5.1+** (included with Windows)
+- **Visual C++ Redistributables** - Required for ExplorerBlurMica
+  - Download: [VC++ Redist x64](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+  - The script will notify you if this is missing
 
 ## Installation
 
@@ -216,6 +219,40 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 - Run PowerShell as Administrator (required!)
 - Disable antivirus temporarily if it blocks DLL registration
 
+### DLL Registration Failed (0xC0000005)
+**Issue:** ExplorerBlurMica fails with Access Violation error
+
+**Solution:**
+This error means Visual C++ Redistributables are missing:
+1. Download and install: [VC++ Redist x64](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+2. Restart your computer
+3. Run the installation script again
+
+### WinGet Package Not Available (-1978335189)
+**Issue:** MicaForEveryone or TranslucentTB installation fails
+
+**Solution:**
+Install manually from GitHub releases:
+- **MicaForEveryone**: https://github.com/MicaForEveryone/MicaForEveryone/releases
+  - Download the `.msixbundle` file
+  - Double-click to install
+- **TranslucentTB**: https://github.com/TranslucentTB/TranslucentTB/releases
+  - Download the `.msixbundle` file
+  - Double-click to install
+
+Alternatively, try installing from Microsoft Store:
+- MicaForEveryone: Search in Microsoft Store
+- TranslucentTB: Search "TranslucentTB" in Microsoft Store
+
+### All Components Failed
+**Issue:** Nothing installs successfully
+
+**Common Causes:**
+1. **Missing VC++ Redistributables** - Install from link above
+2. **WinGet not working** - Update Windows or install App Installer from Microsoft Store
+3. **Network/Firewall issues** - Check internet connection and firewall settings
+4. **Antivirus blocking** - Temporarily disable antivirus during installation
+
 ## Tools Used
 
 This script automates the installation of these excellent open-source projects:
@@ -258,6 +295,49 @@ winget upgrade --all
 **Q: Will this survive Windows updates?**
 A: Yes, but you may need to re-run the script if Windows updates break the effects.
 
+**Q: Why did installation fail with error -1978335189?**
+A: This is a WinGet package error. The packages may be temporarily unavailable or your WinGet needs updating. Install the tools manually from their GitHub releases pages (see Troubleshooting section).
+
+**Q: What is error 0xC0000005 (Access Violation)?**
+A: This means Visual C++ Redistributables are missing. Download and install from: https://aka.ms/vs/17/release/vc_redist.x64.exe
+
+**Q: Do I need Visual C++ Redistributables?**
+A: Yes, ExplorerBlurMica requires them. The script will tell you if they're missing and provide a download link.
+
+**Q: Can I install the tools individually if the script fails?**
+A: Yes! See the "Manual Installation" section below for step-by-step instructions.
+
+## Manual Installation
+
+If the automated script fails, you can install each tool manually:
+
+### MicaForEveryone
+1. Visit: https://github.com/MicaForEveryone/MicaForEveryone/releases
+2. Download the latest `.msixbundle` file
+3. Double-click the file to install
+4. Launch from Start Menu
+
+### TranslucentTB
+1. Visit: https://github.com/TranslucentTB/TranslucentTB/releases
+2. Download the latest `.msixbundle` file
+3. Double-click the file to install
+4. Launch from Start Menu
+
+### ExplorerBlurMica
+1. Install Visual C++ Redistributables: [Download x64](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+2. Restart your computer
+3. Visit: https://github.com/Maplespe/ExplorerBlurMica/releases
+4. Download `Release_x64.zip`
+5. Extract to: `C:\Program Files\ExplorerBlurMica\`
+6. Open PowerShell as Administrator and run:
+   ```powershell
+   regsvr32 "C:\Program Files\ExplorerBlurMica\ExplorerBlurMica.dll"
+   ```
+7. Restart Windows Explorer:
+   ```powershell
+   Stop-Process -Name explorer -Force
+   ```
+
 ## Uninstallation
 
 To completely remove all glass effects and restore defaults:
@@ -272,6 +352,13 @@ The script will:
 - Unregister and remove ExplorerBlurMica
 - Clean up all configuration files
 - Restart Explorer
+
+## Known Issues
+
+- **WinGet Package Availability**: Sometimes WinGet packages are temporarily unavailable. Use manual installation if this happens.
+- **VC++ Redistributables**: ExplorerBlurMica requires Visual C++ Redistributables. The script will detect and notify you if missing.
+- **First Run**: Some effects may require a restart or logout to appear fully.
+- **Antivirus Interference**: Some antivirus software may block DLL registration. Temporarily disable if needed.
 
 ## License
 
