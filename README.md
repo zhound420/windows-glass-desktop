@@ -15,9 +15,8 @@ cd windows-glass-desktop
 # 2. Open PowerShell as Administrator, then run:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-# 3. Install everything automatically
+# 3. Run the script - it installs everything automatically!
 .\Install-GlassDesktop.ps1
-Install-GlassDesktop
 ```
 
 That's it! Your Windows 11 desktop will now have beautiful glass effects. Restart your PC to see the full transformation.
@@ -66,7 +65,6 @@ This script automatically installs and configures three powerful tools to give y
    ```powershell
    cd path\to\script
    .\Install-GlassDesktop.ps1
-   Install-GlassDesktop
    ```
 
 5. **Restart or log out/in** to see full effects
@@ -89,14 +87,18 @@ The script will:
 
 ### Install Glass Desktop
 ```powershell
+# Simply run the script (installs automatically)
 .\Install-GlassDesktop.ps1
-Install-GlassDesktop
+```
+
+### Show Help
+```powershell
+.\Install-GlassDesktop.ps1 -Help
 ```
 
 ### Uninstall Glass Desktop
 ```powershell
-.\Install-GlassDesktop.ps1
-Uninstall-GlassDesktop
+.\Install-GlassDesktop.ps1 -Uninstall
 ```
 
 The uninstall function will:
@@ -261,8 +263,7 @@ A: Yes, but you may need to re-run the script if Windows updates break the effec
 To completely remove all glass effects and restore defaults:
 
 ```powershell
-.\Install-GlassDesktop.ps1
-Uninstall-GlassDesktop
+.\Install-GlassDesktop.ps1 -Uninstall
 ```
 
 The script will:

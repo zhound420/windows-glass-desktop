@@ -13,13 +13,27 @@
     Requires Windows 10 (build 18362+) or Windows 11
 
 .EXAMPLE
-    Install-GlassDesktop
+    .\Install-GlassDesktop.ps1
+    Runs installation automatically (default behavior)
 
 .EXAMPLE
-    Uninstall-GlassDesktop
+    .\Install-GlassDesktop.ps1 -Help
+    Displays usage information
+
+.EXAMPLE
+    .\Install-GlassDesktop.ps1 -Uninstall
+    Removes all glass desktop components
 #>
 
 #Requires -RunAsAdministrator
+
+param(
+    [Parameter(HelpMessage="Display usage information")]
+    [switch]$Help,
+
+    [Parameter(HelpMessage="Uninstall all glass desktop components")]
+    [switch]$Uninstall
+)
 
 # Global variables
 $Script:ExplorerBlurMicaPath = "C:\Program Files\ExplorerBlurMica"
@@ -432,35 +446,51 @@ function Uninstall-GlassDesktop {
     }
 }
 
-# Display usage information if script is run directly
+# Main execution logic
 if ($MyInvocation.InvocationName -ne '.') {
-    $helpText = @(
-        '================================================================='
-        ''
-        '        Windows 11 Glass Desktop Automation Script'
-        ''
-        '================================================================='
-        ''
-        'Usage:'
-        '  Install:   Install-GlassDesktop'
-        '  Uninstall: Uninstall-GlassDesktop'
-        ''
-        'What this script does:'
-        '  - Installs MicaForEveryone for Acrylic window effects'
-        '  - Installs TranslucentTB for Acrylic taskbar'
-        '  - Installs ExplorerBlurMica for Acrylic File Explorer'
-        '  - Configures all tools with Acrylic visual effects'
-        '  - Provides easy uninstall function'
-        ''
-        'Requirements:'
-        '  - Windows 10 (build 18362+) or Windows 11'
-        '  - Administrator privileges'
-        '  - Internet connection'
-        ''
-        'Examples:'
-        '  .\Install-GlassDesktop.ps1; Install-GlassDesktop'
-        '  .\Install-GlassDesktop.ps1; Uninstall-GlassDesktop'
-        ''
-    )
-    Write-Host ($helpText -join "`n") -ForegroundColor Cyan
+    # Script is being run directly (not dot-sourced)
+
+    if ($Help) {
+        # Display help information
+        $helpText = @(
+            '================================================================='
+            ''
+            '        Windows 11 Glass Desktop Automation Script'
+            ''
+            '================================================================='
+            ''
+            'Usage:'
+            '  .\Install-GlassDesktop.ps1            # Install (default)'
+            '  .\Install-GlassDesktop.ps1 -Help      # Show this help'
+            '  .\Install-GlassDesktop.ps1 -Uninstall # Remove all components'
+            ''
+            'What this script does:'
+            '  - Installs MicaForEveryone for Acrylic window effects'
+            '  - Installs TranslucentTB for Acrylic taskbar'
+            '  - Installs ExplorerBlurMica for Acrylic File Explorer'
+            '  - Configures all tools with Acrylic visual effects'
+            '  - Provides easy uninstall function'
+            ''
+            'Requirements:'
+            '  - Windows 10 (build 18362+) or Windows 11'
+            '  - Administrator privileges'
+            '  - Internet connection'
+            ''
+            'Advanced Usage:'
+            '  You can also dot-source this script and call functions directly:'
+            '  . .\Install-GlassDesktop.ps1'
+            '  Install-GlassDesktop'
+            '  Uninstall-GlassDesktop'
+            ''
+        )
+        Write-Host ($helpText -join "`n") -ForegroundColor Cyan
+    }
+    elseif ($Uninstall) {
+        # Run uninstallation
+        Uninstall-GlassDesktop
+    }
+    else {
+        # Default: Run installation
+        Install-GlassDesktop
+    }
 }
