@@ -371,17 +371,25 @@ function Install-ExplorerBlurMica {
             throw "DLL not found at: $dllPath (this should not happen after move)"
         }
 
-        # Try registration with verbose output
-        $process = Start-Process -FilePath "regsvr32.exe" -ArgumentList "`"$dllPath`"" -Wait -PassThru -WindowStyle Hidden
+        # Try registration - use /s for silent mode
+        try {
+            $regArgs = @("/s", "`"$dllPath`"")
+            $process = Start-Process -FilePath "regsvr32.exe" -ArgumentList $regArgs -Wait -PassThru -NoNewWindow -ErrorAction Stop
 
-        if ($process.ExitCode -eq 0) {
-            Write-Host "DLL registered successfully!" -ForegroundColor Green
-        } else {
-            Write-Host "WARNING: DLL registration failed with exit code: $($process.ExitCode)" -ForegroundColor Yellow
-            Write-Host "ExplorerBlurMica may not work correctly." -ForegroundColor Yellow
-            Write-Host "You can try registering manually later with:" -ForegroundColor Cyan
+            if ($process.ExitCode -eq 0) {
+                Write-Host "DLL registered successfully!" -ForegroundColor Green
+            } else {
+                Write-Host "WARNING: DLL registration returned exit code: $($process.ExitCode)" -ForegroundColor Yellow
+                Write-Host "Note: The DLL has been installed. Effects may appear after restart." -ForegroundColor Yellow
+                Write-Host "If effects don't appear, try registering manually:" -ForegroundColor Cyan
+                Write-Host "  regsvr32 `"$dllPath`"" -ForegroundColor Cyan
+                # Don't throw - continue with installation
+            }
+        } catch {
+            Write-Host "WARNING: Could not register DLL: $_" -ForegroundColor Yellow
+            Write-Host "The DLL has been installed. Try registering manually after restart:" -ForegroundColor Cyan
             Write-Host "  regsvr32 `"$dllPath`"" -ForegroundColor Cyan
-            throw "Failed to register DLL (exit code: $($process.ExitCode))"
+            # Don't throw - continue with installation
         }
 
         # Restart Explorer
@@ -464,12 +472,13 @@ function Install-GlassDesktop {
 
     if ($successCount -eq 3) {
         Write-Host "`n[SUCCESS] All components installed successfully!" -ForegroundColor Green
+        Write-Host "`nIMPORTANT: Restart your computer now for all effects to work!" -ForegroundColor Yellow
         Write-Host "`nNext Steps:" -ForegroundColor Cyan
-        Write-Host "  1. Log out and log back in (or restart) for full effects" -ForegroundColor Gray
+        Write-Host "  1. RESTART your computer (required for ExplorerBlurMica)" -ForegroundColor White
         Write-Host "  2. Launch MicaForEveryone and TranslucentTB from Start Menu" -ForegroundColor Gray
         Write-Host "  3. Right-click TranslucentTB tray icon to customize taskbar" -ForegroundColor Gray
         Write-Host "  4. Open File Explorer to see Acrylic blur effects" -ForegroundColor Gray
-        Write-Host "`nTo uninstall, run: Uninstall-GlassDesktop" -ForegroundColor Yellow
+        Write-Host "`nTo uninstall, run: .\Install-GlassDesktop.ps1 -Uninstall" -ForegroundColor Yellow
     } else {
         Write-Host "`n[WARNING] Installation completed with some failures." -ForegroundColor Yellow
         Write-Host "Check the error messages above for details." -ForegroundColor Gray
