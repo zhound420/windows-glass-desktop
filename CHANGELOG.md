@@ -45,4 +45,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[1.0.0]: https://github.com/YOUR_USERNAME/windows-glass-desktop/releases/tag/v1.0.0
+[1.0.0]: https://github.com/zhound420/windows-glass-desktop/releases/tag/v1.0.0

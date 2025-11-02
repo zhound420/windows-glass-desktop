@@ -9,7 +9,7 @@ Automated PowerShell script to transform your Windows 11 desktop with beautiful 
 
 ```powershell
 # 1. Download the script
-git clone https://github.com/YOUR_USERNAME/windows-glass-desktop.git
+git clone https://github.com/zhound420/windows-glass-desktop.git
 cd windows-glass-desktop
 
 # 2. Open PowerShell as Administrator, then run:
