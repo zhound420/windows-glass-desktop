@@ -15,11 +15,15 @@ cd windows-glass-desktop
 # 2. Open PowerShell as Administrator, then run:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-# 3. Run the script - it installs everything automatically!
+# 3. Run the script - it does everything automatically!
 .\Install-GlassDesktop.ps1
 ```
 
-That's it! Your Windows 11 desktop will now have beautiful glass effects. Restart your PC to see the full transformation.
+**That's it!** Glass effects appear immediately:
+- ✨ Your taskbar becomes translucent instantly
+- ✨ Window backgrounds get the Acrylic blur effect
+- ✨ Applications auto-launch and are configured to start at login
+- ✨ File Explorer blur may require a restart to fully activate
 
 ## What This Does
 
@@ -70,21 +74,27 @@ This script automatically installs and configures three powerful tools to give y
    .\Install-GlassDesktop.ps1
    ```
 
-5. **Restart or log out/in** to see full effects
+5. **Effects appear immediately!** (File Explorer may need restart)
 
 ### What Happens During Installation
 
 The script will:
 1. ✅ Check Windows version compatibility
 2. ✅ Verify administrator privileges
-3. ✅ Install WinGet if not present
-4. ✅ Download and install MicaForEveryone via WinGet
-5. ✅ Download and install TranslucentTB via WinGet
-6. ✅ Download ExplorerBlurMica from GitHub
-7. ✅ Configure all tools with Acrylic effects
-8. ✅ Register ExplorerBlurMica DLL
-9. ✅ Restart Windows Explorer
-10. ✅ Display installation summary
+3. ✅ Auto-install Visual C++ Redistributables if needed
+4. ✅ Install WinGet if not present
+5. ✅ Download and install MicaForEveryone (with MSIX fallback)
+6. ✅ Download and install TranslucentTB (with MSIX fallback)
+7. ✅ **Launch both applications automatically**
+8. ✅ **Configure auto-startup at login via Task Scheduler**
+9. ✅ Download and extract ExplorerBlurMica from GitHub
+10. ✅ Configure all tools with Acrylic effects
+11. ✅ Unblock downloaded DLL files
+12. ✅ Register ExplorerBlurMica DLL
+13. ✅ Restart Windows Explorer
+14. ✅ Display installation summary
+
+**No manual steps required** - everything is automated!
 
 ## Usage
 
@@ -190,13 +200,18 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ### Effects Not Appearing
 **Issue:** Installed but no visual changes
 
-**Solutions:**
-1. Log out and log back in
-2. Restart your computer
-3. Launch MicaForEveryone from Start Menu
-4. Launch TranslucentTB from Start Menu
-5. Ensure Windows 11 transparency effects are enabled:
+**Note:** As of the latest version, the script automatically launches applications, so effects should appear immediately.
+
+**If effects still don't appear:**
+1. Check if apps are running:
+   - Look for TranslucentTB icon in system tray
+   - Check Task Manager for "MicaForEveryone" process
+2. Ensure Windows 11 transparency effects are enabled:
    - Settings → Personalization → Colors → Transparency effects = ON
+3. For File Explorer blur: Restart your computer
+4. If apps aren't running, launch them manually from Start Menu:
+   - MicaForEveryone
+   - TranslucentTB
 
 ### ExplorerBlurMica Not Working
 **Issue:** File Explorer has no blur effect

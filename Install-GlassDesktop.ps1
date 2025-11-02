@@ -141,6 +141,68 @@ function Install-MSIXPackage {
     }
 }
 
+function Start-MSIXApp {
+    <#
+    .SYNOPSIS
+        Launches an installed MSIX application and configures it for startup.
+    #>
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$AppName,
+
+        [Parameter(Mandatory=$true)]
+        [string]$PackageFamilyName
+    )
+
+    try {
+        Write-Host "Launching $AppName..." -ForegroundColor Gray
+
+        # Get the installed package
+        $package = Get-AppxPackage | Where-Object { $_.Name -like "*$PackageFamilyName*" } | Select-Object -First 1
+
+        if (-not $package) {
+            Write-Host "WARNING: Could not find installed package for $AppName" -ForegroundColor Yellow
+            return $false
+        }
+
+        # Get the Application ID
+        $manifest = Get-AppxPackageManifest $package
+        $appId = $manifest.Package.Applications.Application.Id
+
+        if (-not $appId) {
+            Write-Host "WARNING: Could not find Application ID for $AppName" -ForegroundColor Yellow
+            return $false
+        }
+
+        # Launch the app using shell protocol
+        $appUserModelId = "$($package.PackageFamilyName)!$appId"
+        Start-Process "shell:AppsFolder\$appUserModelId"
+
+        Write-Host "$AppName launched successfully!" -ForegroundColor Green
+
+        # Add to startup using Task Scheduler for reliability
+        $taskName = "GlassDesktop_$AppName"
+        $existingTask = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+
+        if (-not $existingTask) {
+            Write-Host "Configuring $AppName to start at login..." -ForegroundColor Gray
+            $action = New-ScheduledTaskAction -Execute "explorer.exe" -Argument "shell:AppsFolder\$appUserModelId"
+            $trigger = New-ScheduledTaskTrigger -AtLogon
+            $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive
+            $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0
+
+            Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null
+            Write-Host "$AppName will now start automatically at login" -ForegroundColor Green
+        }
+
+        return $true
+    } catch {
+        Write-Host "WARNING: Could not launch $AppName: $_" -ForegroundColor Yellow
+        Write-Host "You can launch it manually from the Start Menu" -ForegroundColor Gray
+        return $false
+    }
+}
+
 function Install-WinGetIfMissing {
     <#
     .SYNOPSIS
@@ -236,6 +298,10 @@ function Install-MicaForEveryone {
         $configLines | Out-File -FilePath $configFile -Encoding UTF8 -Force
         Write-Host "Configuration file created: $configFile" -ForegroundColor Green
 
+        # Launch the application and configure startup
+        Write-Host "`nStarting MicaForEveryone..." -ForegroundColor Cyan
+        Start-MSIXApp -AppName "MicaForEveryone" -PackageFamilyName "MicaForEveryone"
+
         return $true
     } catch {
         Write-Host "ERROR: Failed to install MicaForEveryone: $_" -ForegroundColor Red
@@ -271,6 +337,10 @@ function Install-TranslucentTB {
 
         Write-Host "TranslucentTB will use Acrylic effect by default." -ForegroundColor Gray
         Write-Host "You can customize settings by right-clicking its system tray icon." -ForegroundColor Gray
+
+        # Launch the application and configure startup
+        Write-Host "`nStarting TranslucentTB..." -ForegroundColor Cyan
+        Start-MSIXApp -AppName "TranslucentTB" -PackageFamilyName "TranslucentTB"
 
         return $true
     } catch {
@@ -369,6 +439,12 @@ function Install-ExplorerBlurMica {
 
         if (-not (Test-Path $dllPath)) {
             throw "DLL not found at: $dllPath (this should not happen after move)"
+        }
+
+        # Unblock all files in the directory (Windows blocks downloaded files)
+        Write-Host "Unblocking downloaded files..." -ForegroundColor Gray
+        Get-ChildItem -Path $Script:ExplorerBlurMicaPath -Recurse -File | ForEach-Object {
+            Unblock-File -Path $_.FullName -ErrorAction SilentlyContinue
         }
 
         # Try registration - use /s for silent mode
@@ -471,13 +547,17 @@ function Install-GlassDesktop {
     $successCount = ($results.Values | Where-Object { $_ -eq $true }).Count - 2  # Exclude Prerequisites and WinGet
 
     if ($successCount -eq 3) {
-        Write-Host "`n[SUCCESS] All components installed successfully!" -ForegroundColor Green
-        Write-Host "`nIMPORTANT: Restart your computer now for all effects to work!" -ForegroundColor Yellow
+        Write-Host "`n[SUCCESS] All components installed and running!" -ForegroundColor Green
+        Write-Host "`nGlass effects are now active! You should see:" -ForegroundColor Cyan
+        Write-Host "  - Translucent taskbar with blur (TranslucentTB)" -ForegroundColor Gray
+        Write-Host "  - Acrylic window backgrounds (MicaForEveryone)" -ForegroundColor Gray
+        Write-Host "  - Blurred File Explorer (ExplorerBlurMica - may need restart)" -ForegroundColor Gray
         Write-Host "`nNext Steps:" -ForegroundColor Cyan
-        Write-Host "  1. RESTART your computer (required for ExplorerBlurMica)" -ForegroundColor White
-        Write-Host "  2. Launch MicaForEveryone and TranslucentTB from Start Menu" -ForegroundColor Gray
-        Write-Host "  3. Right-click TranslucentTB tray icon to customize taskbar" -ForegroundColor Gray
-        Write-Host "  4. Open File Explorer to see Acrylic blur effects" -ForegroundColor Gray
+        Write-Host "  1. Look at your taskbar - it should be translucent now!" -ForegroundColor White
+        Write-Host "  2. Open any application window - notice the Acrylic effect" -ForegroundColor White
+        Write-Host "  3. If File Explorer blur isn't visible, restart your computer" -ForegroundColor White
+        Write-Host "  4. Right-click TranslucentTB tray icon to customize taskbar" -ForegroundColor Gray
+        Write-Host "`nBoth apps will start automatically at login." -ForegroundColor Green
         Write-Host "`nTo uninstall, run: .\Install-GlassDesktop.ps1 -Uninstall" -ForegroundColor Yellow
     } else {
         Write-Host "`n[WARNING] Installation completed with some failures." -ForegroundColor Yellow
