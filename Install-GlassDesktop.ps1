@@ -218,6 +218,31 @@ function Install-ExplorerBlurMica {
         Write-Host "Extracting files to: $Script:ExplorerBlurMicaPath" -ForegroundColor Gray
         Expand-Archive -Path $zipPath -DestinationPath $Script:ExplorerBlurMicaPath -Force
 
+        # Check if DLL is in a subdirectory and move files if needed
+        $dllPath = Join-Path $Script:ExplorerBlurMicaPath "ExplorerBlurMica.dll"
+        if (-not (Test-Path $dllPath)) {
+            Write-Host "DLL not in root, searching subdirectories..." -ForegroundColor Gray
+            $foundDll = Get-ChildItem -Path $Script:ExplorerBlurMicaPath -Filter "ExplorerBlurMica.dll" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+
+            if ($foundDll) {
+                Write-Host "Found DLL in: $($foundDll.DirectoryName)" -ForegroundColor Gray
+                # Move all files from subdirectory to root
+                Get-ChildItem -Path $foundDll.DirectoryName -File | ForEach-Object {
+                    Copy-Item -Path $_.FullName -Destination $Script:ExplorerBlurMicaPath -Force
+                    Write-Host "  Moved: $($_.Name)" -ForegroundColor Gray
+                }
+                # Clean up subdirectory
+                Remove-Item -Path $foundDll.DirectoryName -Recurse -Force -ErrorAction SilentlyContinue
+            } else {
+                # List what we actually got
+                Write-Host "ERROR: DLL not found. Extracted files:" -ForegroundColor Red
+                Get-ChildItem -Path $Script:ExplorerBlurMicaPath -Recurse | ForEach-Object {
+                    Write-Host "  $($_.FullName)" -ForegroundColor Yellow
+                }
+                throw "ExplorerBlurMica.dll not found in download"
+            }
+        }
+
         # Create config.ini with Acrylic effect
         Write-Host "Creating Acrylic configuration..." -ForegroundColor Gray
         $configLines = @(
@@ -247,10 +272,11 @@ function Install-ExplorerBlurMica {
 
         # Register DLL
         Write-Host "Registering ExplorerBlurMica DLL..." -ForegroundColor Gray
+        # Re-check DLL path after potential move
         $dllPath = Join-Path $Script:ExplorerBlurMicaPath "ExplorerBlurMica.dll"
 
         if (-not (Test-Path $dllPath)) {
-            throw "DLL not found at: $dllPath"
+            throw "DLL not found at: $dllPath (this should not happen after move)"
         }
 
         $process = Start-Process -FilePath "regsvr32.exe" -ArgumentList "/s `"$dllPath`"" -Wait -PassThru
