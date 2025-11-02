@@ -104,7 +104,7 @@ function Install-VCRedist {
             return $false
         }
     } catch {
-        Write-Host "ERROR: Failed to install VC++ Redistributables: $_" -ForegroundColor Red
+        Write-Host "ERROR: Failed to install VC++ Redistributables: $($_)" -ForegroundColor Red
         Write-Host "Please install manually from: $Script:VCRedistUrl" -ForegroundColor Yellow
         return $false
     }
@@ -136,7 +136,7 @@ function Install-MSIXPackage {
         Remove-Item $msixPath -Force -ErrorAction SilentlyContinue
         return $true
     } catch {
-        Write-Host "ERROR: Failed to install $Name via MSIX: $_" -ForegroundColor Red
+        Write-Host "ERROR: Failed to install $Name via MSIX: $($_)" -ForegroundColor Red
         return $false
     }
 }
@@ -197,7 +197,7 @@ function Start-MSIXApp {
 
         return $true
     } catch {
-        Write-Host "WARNING: Could not launch $AppName: $_" -ForegroundColor Yellow
+        Write-Host "WARNING: Could not launch $AppName: $($_)" -ForegroundColor Yellow
         Write-Host "You can launch it manually from the Start Menu" -ForegroundColor Gray
         return $false
     }
@@ -304,7 +304,7 @@ function Install-MicaForEveryone {
 
         return $true
     } catch {
-        Write-Host "ERROR: Failed to install MicaForEveryone: $_" -ForegroundColor Red
+        Write-Host "ERROR: Failed to install MicaForEveryone: $($_)" -ForegroundColor Red
         return $false
     }
 }
@@ -344,7 +344,7 @@ function Install-TranslucentTB {
 
         return $true
     } catch {
-        Write-Host "ERROR: Failed to install TranslucentTB: $_" -ForegroundColor Red
+        Write-Host "ERROR: Failed to install TranslucentTB: $($_)" -ForegroundColor Red
         return $false
     }
 }
@@ -462,7 +462,7 @@ function Install-ExplorerBlurMica {
                 # Don't throw - continue with installation
             }
         } catch {
-            Write-Host "WARNING: Could not register DLL: $_" -ForegroundColor Yellow
+            Write-Host "WARNING: Could not register DLL: $($_)" -ForegroundColor Yellow
             Write-Host "The DLL has been installed. Try registering manually after restart:" -ForegroundColor Cyan
             Write-Host "  regsvr32 `"$dllPath`"" -ForegroundColor Cyan
             # Don't throw - continue with installation
@@ -477,7 +477,7 @@ function Install-ExplorerBlurMica {
         return $true
 
     } catch {
-        Write-Host "ERROR: Failed to install ExplorerBlurMica: $_" -ForegroundColor Red
+        Write-Host "ERROR: Failed to install ExplorerBlurMica: $($_)" -ForegroundColor Red
         return $false
     } finally {
         # Cleanup
@@ -595,7 +595,7 @@ function Uninstall-GlassDesktop {
         $results.MicaForEveryone = $true
         Write-Host "MicaForEveryone uninstalled." -ForegroundColor Green
     } catch {
-        Write-Host "Failed to uninstall MicaForEveryone: $_" -ForegroundColor Red
+        Write-Host "Failed to uninstall MicaForEveryone: $($_)" -ForegroundColor Red
     }
 
     # Uninstall TranslucentTB
@@ -605,7 +605,7 @@ function Uninstall-GlassDesktop {
         $results.TranslucentTB = $true
         Write-Host "TranslucentTB uninstalled." -ForegroundColor Green
     } catch {
-        Write-Host "Failed to uninstall TranslucentTB: $_" -ForegroundColor Red
+        Write-Host "Failed to uninstall TranslucentTB: $($_)" -ForegroundColor Red
     }
 
     # Uninstall ExplorerBlurMica
@@ -638,7 +638,7 @@ function Uninstall-GlassDesktop {
         Start-Sleep -Seconds 2
 
     } catch {
-        Write-Host "Failed to uninstall ExplorerBlurMica: $_" -ForegroundColor Red
+        Write-Host "Failed to uninstall ExplorerBlurMica: $($_)" -ForegroundColor Red
     }
 
     # Summary
