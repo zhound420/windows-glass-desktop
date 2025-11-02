@@ -108,13 +108,21 @@ function Install-MicaForEveryone {
     Write-Host "`n=== Installing MicaForEveryone ===" -ForegroundColor Cyan
 
     try {
-        # Install via WinGet
+        # Install via WinGet with better error handling
         Write-Host "Installing MicaForEveryone via WinGet..." -ForegroundColor Gray
-        winget install --id=MicaForEveryone.MicaForEveryone -e --silent --accept-package-agreements --accept-source-agreements
 
-        if ($LASTEXITCODE -eq 0) {
+        # Capture output for better error messages
+        $output = winget install --id=MicaForEveryone.MicaForEveryone -e --accept-package-agreements --accept-source-agreements 2>&1
+
+        if ($LASTEXITCODE -eq 0 -or $output -like "*Successfully installed*") {
             Write-Host "MicaForEveryone installed successfully!" -ForegroundColor Green
+        } elseif ($LASTEXITCODE -eq -1978335189) {
+            Write-Host "WinGet package issue detected. Trying alternative installation..." -ForegroundColor Yellow
+            Write-Host "Note: You may need to install MicaForEveryone manually from:" -ForegroundColor Yellow
+            Write-Host "  https://github.com/MicaForEveryone/MicaForEveryone/releases" -ForegroundColor Cyan
+            throw "WinGet installation failed - package may not be available"
         } else {
+            Write-Host "WinGet output: $output" -ForegroundColor Yellow
             throw "WinGet installation failed with exit code $LASTEXITCODE"
         }
 
@@ -171,13 +179,21 @@ function Install-TranslucentTB {
     Write-Host "`n=== Installing TranslucentTB ===" -ForegroundColor Cyan
 
     try {
-        # Install via WinGet
+        # Install via WinGet with better error handling
         Write-Host "Installing TranslucentTB via WinGet..." -ForegroundColor Gray
-        winget install --id=CharlesMilette.TranslucentTB -e --silent --accept-package-agreements --accept-source-agreements
 
-        if ($LASTEXITCODE -eq 0) {
+        # Capture output for better error messages
+        $output = winget install --id=CharlesMilette.TranslucentTB -e --accept-package-agreements --accept-source-agreements 2>&1
+
+        if ($LASTEXITCODE -eq 0 -or $output -like "*Successfully installed*") {
             Write-Host "TranslucentTB installed successfully!" -ForegroundColor Green
+        } elseif ($LASTEXITCODE -eq -1978335189) {
+            Write-Host "WinGet package issue detected. Trying alternative installation..." -ForegroundColor Yellow
+            Write-Host "Note: You may need to install TranslucentTB manually from:" -ForegroundColor Yellow
+            Write-Host "  https://github.com/TranslucentTB/TranslucentTB/releases" -ForegroundColor Cyan
+            throw "WinGet installation failed - package may not be available"
         } else {
+            Write-Host "WinGet output: $output" -ForegroundColor Yellow
             throw "WinGet installation failed with exit code $LASTEXITCODE"
         }
 
@@ -270,7 +286,7 @@ function Install-ExplorerBlurMica {
         $configLines | Out-File -FilePath $configPath -Encoding UTF8 -Force
         Write-Host "Configuration file created: $configPath" -ForegroundColor Green
 
-        # Register DLL
+        # Register DLL with better error handling
         Write-Host "Registering ExplorerBlurMica DLL..." -ForegroundColor Gray
         # Re-check DLL path after potential move
         $dllPath = Join-Path $Script:ExplorerBlurMicaPath "ExplorerBlurMica.dll"
@@ -279,11 +295,25 @@ function Install-ExplorerBlurMica {
             throw "DLL not found at: $dllPath (this should not happen after move)"
         }
 
-        $process = Start-Process -FilePath "regsvr32.exe" -ArgumentList "/s `"$dllPath`"" -Wait -PassThru
+        # Try registration with verbose output
+        $process = Start-Process -FilePath "regsvr32.exe" -ArgumentList "`"$dllPath`"" -Wait -PassThru -WindowStyle Hidden
 
         if ($process.ExitCode -eq 0) {
             Write-Host "DLL registered successfully!" -ForegroundColor Green
+        } elseif ($process.ExitCode -eq -1073741819) {
+            Write-Host "WARNING: DLL registration failed (Access Violation - 0xC0000005)" -ForegroundColor Yellow
+            Write-Host "This is often caused by missing Visual C++ Redistributables." -ForegroundColor Yellow
+            Write-Host "" -ForegroundColor Yellow
+            Write-Host "Please install the Visual C++ Redistributable:" -ForegroundColor Cyan
+            Write-Host "  https://aka.ms/vs/17/release/vc_redist.x64.exe" -ForegroundColor Cyan
+            Write-Host "" -ForegroundColor Yellow
+            Write-Host "After installing, restart your computer and run the script again." -ForegroundColor Yellow
+            throw "DLL registration failed - missing dependencies"
         } else {
+            Write-Host "WARNING: DLL registration failed with exit code: $($process.ExitCode)" -ForegroundColor Yellow
+            Write-Host "ExplorerBlurMica may not work correctly." -ForegroundColor Yellow
+            Write-Host "You can try registering manually later with:" -ForegroundColor Cyan
+            Write-Host "  regsvr32 `"$dllPath`"" -ForegroundColor Cyan
             throw "Failed to register DLL (exit code: $($process.ExitCode))"
         }
 
