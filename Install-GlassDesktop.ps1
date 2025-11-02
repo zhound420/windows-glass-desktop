@@ -40,7 +40,7 @@ $Script:ExplorerBlurMicaPath = "C:\Program Files\ExplorerBlurMica"
 $Script:ExplorerBlurMicaUrl = "https://github.com/Maplespe/ExplorerBlurMica/releases/download/2.0.1/Release_x64.zip"
 $Script:VCRedistUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
 $Script:MicaForEveryoneUrl = "https://github.com/MicaForEveryone/MicaForEveryone/releases/download/2.0.5.0/bundle.msixbundle"
-$Script:TranslucentTBUrl = "https://github.com/TranslucentTB/TranslucentTB/releases/download/2025.1/bundle.msixbundle"
+$Script:TranslucentTBUrl = "https://github.com/TranslucentTB/TranslucentTB/releases/download/2024.4/bundle.msixbundle"
 
 function Test-Prerequisites {
     <#
@@ -174,6 +174,11 @@ function Start-MSIXApp {
             return $false
         }
 
+        # Restart Explorer to prevent XAML Diagnostics errors (fixes TranslucentTB crash)
+        Write-Host "Preparing XAML environment for $AppName..." -ForegroundColor Gray
+        Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+
         # Launch the app using shell protocol
         $appUserModelId = "$($package.PackageFamilyName)!$appId"
         Start-Process "shell:AppsFolder\$appUserModelId"
@@ -188,6 +193,7 @@ function Start-MSIXApp {
             Write-Host "Configuring $AppName to start at login..." -ForegroundColor Gray
             $action = New-ScheduledTaskAction -Execute "explorer.exe" -Argument "shell:AppsFolder\$appUserModelId"
             $trigger = New-ScheduledTaskTrigger -AtLogon
+            $trigger.Delay = 'PT30S'  # 30 second delay after login to allow XAML initialization
             $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive
             $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0
 
