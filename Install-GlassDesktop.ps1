@@ -272,16 +272,16 @@ function Install-GlassDesktop {
         Main installation function that orchestrates the entire glass desktop setup.
     #>
     $banner = @(
-        '╔═══════════════════════════════════════════════════════════╗'
-        '║                                                           ║'
-        '║        Windows 11 Glass Desktop Installation              ║'
-        '║                                                           ║'
-        '║   This will install and configure:                        ║'
-        '║   • MicaForEveryone (Acrylic window effects)             ║'
-        '║   • TranslucentTB (Acrylic taskbar)                      ║'
-        '║   • ExplorerBlurMica (Acrylic File Explorer)             ║'
-        '║                                                           ║'
-        '╚═══════════════════════════════════════════════════════════╝'
+        '================================================================='
+        ''
+        '        Windows 11 Glass Desktop Installation'
+        ''
+        '   This will install and configure:'
+        '   - MicaForEveryone (Acrylic window effects)'
+        '   - TranslucentTB (Acrylic taskbar)'
+        '   - ExplorerBlurMica (Acrylic File Explorer)'
+        ''
+        '================================================================='
     )
     Write-Host ($banner -join "`n") -ForegroundColor Cyan
 
@@ -314,19 +314,19 @@ function Install-GlassDesktop {
     $results.ExplorerBlurMica = Install-ExplorerBlurMica
 
     # Summary
-    Write-Host "`n╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-Host "║              Installation Summary                         ║" -ForegroundColor Cyan
-    Write-Host "╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+    Write-Host "`n=================================================================" -ForegroundColor Cyan
+    Write-Host "              Installation Summary" -ForegroundColor Cyan
+    Write-Host "=================================================================" -ForegroundColor Cyan
 
     Write-Host "`nComponent Status:" -ForegroundColor White
-    Write-Host "  • MicaForEveryone:    $(if($results.MicaForEveryone){'✓ Installed'}else{'✗ Failed'})" -ForegroundColor $(if($results.MicaForEveryone){'Green'}else{'Red'})
-    Write-Host "  • TranslucentTB:      $(if($results.TranslucentTB){'✓ Installed'}else{'✗ Failed'})" -ForegroundColor $(if($results.TranslucentTB){'Green'}else{'Red'})
-    Write-Host "  • ExplorerBlurMica:   $(if($results.ExplorerBlurMica){'✓ Installed'}else{'✗ Failed'})" -ForegroundColor $(if($results.ExplorerBlurMica){'Green'}else{'Red'})
+    Write-Host "  - MicaForEveryone:    $(if($results.MicaForEveryone){'[OK] Installed'}else{'[FAIL] Failed'})" -ForegroundColor $(if($results.MicaForEveryone){'Green'}else{'Red'})
+    Write-Host "  - TranslucentTB:      $(if($results.TranslucentTB){'[OK] Installed'}else{'[FAIL] Failed'})" -ForegroundColor $(if($results.TranslucentTB){'Green'}else{'Red'})
+    Write-Host "  - ExplorerBlurMica:   $(if($results.ExplorerBlurMica){'[OK] Installed'}else{'[FAIL] Failed'})" -ForegroundColor $(if($results.ExplorerBlurMica){'Green'}else{'Red'})
 
     $successCount = ($results.Values | Where-Object { $_ -eq $true }).Count - 2  # Exclude Prerequisites and WinGet
 
     if ($successCount -eq 3) {
-        Write-Host "`n🎉 All components installed successfully!" -ForegroundColor Green
+        Write-Host "`n[SUCCESS] All components installed successfully!" -ForegroundColor Green
         Write-Host "`nNext Steps:" -ForegroundColor Cyan
         Write-Host "  1. Log out and log back in (or restart) for full effects" -ForegroundColor Gray
         Write-Host "  2. Launch MicaForEveryone and TranslucentTB from Start Menu" -ForegroundColor Gray
@@ -334,7 +334,7 @@ function Install-GlassDesktop {
         Write-Host "  4. Open File Explorer to see Acrylic blur effects" -ForegroundColor Gray
         Write-Host "`nTo uninstall, run: Uninstall-GlassDesktop" -ForegroundColor Yellow
     } else {
-        Write-Host "`n⚠ Installation completed with some failures." -ForegroundColor Yellow
+        Write-Host "`n[WARNING] Installation completed with some failures." -ForegroundColor Yellow
         Write-Host "Check the error messages above for details." -ForegroundColor Gray
     }
 }
@@ -344,9 +344,9 @@ function Uninstall-GlassDesktop {
     .SYNOPSIS
         Removes all glass desktop components and restores default Windows appearance.
     #>
-    Write-Host "`n╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-Host "║        Windows 11 Glass Desktop Uninstallation            ║" -ForegroundColor Cyan
-    Write-Host "╚═══════════════════════════════════════════════════════════╝`n" -ForegroundColor Cyan
+    Write-Host "`n=================================================================" -ForegroundColor Cyan
+    Write-Host "        Windows 11 Glass Desktop Uninstallation" -ForegroundColor Cyan
+    Write-Host "=================================================================`n" -ForegroundColor Cyan
 
     $confirmation = Read-Host "Are you sure you want to uninstall all glass desktop components? (yes/no)"
 
@@ -416,19 +416,19 @@ function Uninstall-GlassDesktop {
     }
 
     # Summary
-    Write-Host "`n═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "`n=================================================================" -ForegroundColor Cyan
     Write-Host "Uninstallation Summary:" -ForegroundColor White
-    Write-Host "  • MicaForEveryone:    $(if($results.MicaForEveryone){'✓ Removed'}else{'✗ Failed'})" -ForegroundColor $(if($results.MicaForEveryone){'Green'}else{'Red'})
-    Write-Host "  • TranslucentTB:      $(if($results.TranslucentTB){'✓ Removed'}else{'✗ Failed'})" -ForegroundColor $(if($results.TranslucentTB){'Green'}else{'Red'})
-    Write-Host "  • ExplorerBlurMica:   $(if($results.ExplorerBlurMica){'✓ Removed'}else{'✗ Failed'})" -ForegroundColor $(if($results.ExplorerBlurMica){'Green'}else{'Red'})
+    Write-Host "  - MicaForEveryone:    $(if($results.MicaForEveryone){'[OK] Removed'}else{'[FAIL] Failed'})" -ForegroundColor $(if($results.MicaForEveryone){'Green'}else{'Red'})
+    Write-Host "  - TranslucentTB:      $(if($results.TranslucentTB){'[OK] Removed'}else{'[FAIL] Failed'})" -ForegroundColor $(if($results.TranslucentTB){'Green'}else{'Red'})
+    Write-Host "  - ExplorerBlurMica:   $(if($results.ExplorerBlurMica){'[OK] Removed'}else{'[FAIL] Failed'})" -ForegroundColor $(if($results.ExplorerBlurMica){'Green'}else{'Red'})
 
     $successCount = ($results.Values | Where-Object { $_ -eq $true }).Count
 
     if ($successCount -eq 3) {
-        Write-Host "`n✓ All components removed successfully!" -ForegroundColor Green
+        Write-Host "`n[SUCCESS] All components removed successfully!" -ForegroundColor Green
         Write-Host "Your Windows desktop has been restored to default appearance." -ForegroundColor Gray
     } else {
-        Write-Host "`n⚠ Uninstallation completed with some failures." -ForegroundColor Yellow
+        Write-Host "`n[WARNING] Uninstallation completed with some failures." -ForegroundColor Yellow
     }
 }
 
@@ -438,27 +438,27 @@ Export-ModuleMember -Function Install-GlassDesktop, Uninstall-GlassDesktop
 # Display usage information if script is run directly
 if ($MyInvocation.InvocationName -ne '.') {
     $helpText = @(
-        '╔═══════════════════════════════════════════════════════════╗'
-        '║                                                           ║'
-        '║        Windows 11 Glass Desktop Automation Script         ║'
-        '║                                                           ║'
-        '╚═══════════════════════════════════════════════════════════╝'
+        '================================================================='
+        ''
+        '        Windows 11 Glass Desktop Automation Script'
+        ''
+        '================================================================='
         ''
         'Usage:'
         '  Install:   Install-GlassDesktop'
         '  Uninstall: Uninstall-GlassDesktop'
         ''
         'What this script does:'
-        '  • Installs MicaForEveryone for Acrylic window effects'
-        '  • Installs TranslucentTB for Acrylic taskbar'
-        '  • Installs ExplorerBlurMica for Acrylic File Explorer'
-        '  • Configures all tools with Acrylic visual effects'
-        '  • Provides easy uninstall function'
+        '  - Installs MicaForEveryone for Acrylic window effects'
+        '  - Installs TranslucentTB for Acrylic taskbar'
+        '  - Installs ExplorerBlurMica for Acrylic File Explorer'
+        '  - Configures all tools with Acrylic visual effects'
+        '  - Provides easy uninstall function'
         ''
         'Requirements:'
-        '  • Windows 10 (build 18362+) or Windows 11'
-        '  • Administrator privileges'
-        '  • Internet connection'
+        '  - Windows 10 (build 18362+) or Windows 11'
+        '  - Administrator privileges'
+        '  - Internet connection'
         ''
         'Examples:'
         '  .\Install-GlassDesktop.ps1; Install-GlassDesktop'
