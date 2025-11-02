@@ -432,9 +432,6 @@ function Uninstall-GlassDesktop {
     }
 }
 
-# Export functions
-Export-ModuleMember -Function Install-GlassDesktop, Uninstall-GlassDesktop
-
 # Display usage information if script is run directly
 if ($MyInvocation.InvocationName -ne '.') {
     $helpText = @(
