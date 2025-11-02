@@ -1,13 +1,13 @@
 # Windows 11 Glass Desktop Automation
 
-Automated PowerShell script to transform your Windows 11 desktop with beautiful glass/translucent effects in one click.
+Automated PowerShell script to transform your Windows 11 interface with beautiful glass/translucent effects on windows, taskbar, and File Explorer in one click.
 
 ![Windows 11 Glass Desktop](https://img.shields.io/badge/Windows-11-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-5391FE?style=for-the-badge&logo=powershell&logoColor=white)
 
 ![Glass Desktop Effects](screenshot.png)
 
-*Showcasing the complete glass desktop transformation: translucent taskbar with Acrylic blur, frosted glass File Explorer with transparent address bar, and Acrylic window backgrounds throughout Windows 11.*
+*Glass effects on Windows 11: translucent taskbar with Acrylic blur, frosted File Explorer with transparent address bar, and Acrylic window backgrounds. Note: Desktop wallpaper remains clear and unaffected.*
 
 ## 🚀 Quick Start (3 Simple Steps)
 
@@ -53,6 +53,13 @@ This script automatically installs and configures three powerful tools to give y
 - **Visual C++ Redistributables** - Required for ExplorerBlurMica
   - Download: [VC++ Redist x64](https://aka.ms/vs/17/release/vc_redist.x64.exe)
   - The script will notify you if this is missing
+
+### What Gets Glass Effects?
+
+- ✅ **Application windows** - Acrylic blur on window backgrounds
+- ✅ **Taskbar** - Translucent with blur effects
+- ✅ **File Explorer** - Frosted glass appearance
+- ❌ **Desktop wallpaper** - Remains clear and unaffected
 
 ## Installation
 

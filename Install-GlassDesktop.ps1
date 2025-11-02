@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Automates the installation and configuration of Windows 11 Glass Desktop effects.
+    Automates the installation and configuration of Windows 11 Glass UI effects for windows, taskbar, and File Explorer.
 
 .DESCRIPTION
-    This script installs and configures three tools to create a beautiful glass/translucent Windows 11 desktop:
+    This script installs and configures three tools to create beautiful glass/translucent effects on Windows 11 UI elements:
     - MicaForEveryone: Applies Acrylic effects to application windows
     - TranslucentTB: Makes the taskbar translucent with Acrylic effect
     - ExplorerBlurMica: Adds Acrylic blur to File Explorer
