@@ -5,6 +5,10 @@ Automated PowerShell script to transform your Windows 11 desktop with beautiful 
 ![Windows 11 Glass Desktop](https://img.shields.io/badge/Windows-11-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-5391FE?style=for-the-badge&logo=powershell&logoColor=white)
 
+![Glass Desktop Effects](screenshot.png)
+
+*Showcasing the complete glass desktop transformation: translucent taskbar with Acrylic blur, frosted glass File Explorer with transparent address bar, and Acrylic window backgrounds throughout Windows 11.*
+
 ## 🚀 Quick Start (3 Simple Steps)
 
 ```powershell
@@ -381,12 +385,6 @@ This automation script is provided as-is for educational purposes. Each tool has
 - MicaForEveryone: MIT License
 - ExplorerBlurMica: MIT License
 - TranslucentTB: GPL-3.0 License
-
-## Screenshots
-
-![Glass Desktop Effects](screenshot.png)
-
-*Showcasing the complete glass desktop transformation: translucent taskbar with Acrylic blur, frosted glass File Explorer with transparent address bar, and Acrylic window backgrounds throughout Windows 11. The Windows Update dialog and File Explorer demonstrate the beautiful depth and transparency effects.*
 
 ## Support
 
